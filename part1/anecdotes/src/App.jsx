@@ -15,8 +15,15 @@ const App = () => {
   const [selected, setSelected] = useState(0)
   const [votes, setVotes] = useState(new Uint8Array(8))
 
+  const maxIndex = (() => {
+    const maxVal = Math.max(...votes); // 最大值
+    const maxIndex = votes.indexOf(maxVal); // 最大值的下标
+    return maxIndex
+  })()
+
   return (
     <div>
+      <h1>Anecdote of the day</h1>
       <p>{anecdotes[selected]}</p>
       <p>has {votes[selected]} votes</p>
       <button onClick={() => {
@@ -25,6 +32,9 @@ const App = () => {
         setVotes(copyVotes)
       }}>vote</button>
       <button onClick={() => { setSelected(Math.floor(Math.random() * 8)) }}>next anecdote</button>
+      <h1>Anecdote with most votes</h1>
+      <p>{anecdotes[maxIndex]}</p>
+      <p>has {votes[maxIndex]} votes</p>
     </div>
   )
 }
