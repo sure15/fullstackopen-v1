@@ -3,6 +3,7 @@ import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
 import axios from 'axios'
+import personService from './services/persons'
 
 
 const App = () => {
@@ -12,15 +13,15 @@ const App = () => {
   const [newFilter, setNewFilter] = useState('')
 
   useEffect(() => {
-    console.log('effect')
+    // console.log('effect')
     axios
       .get('http://localhost:3001/persons')
       .then(response => {
-        console.log('promise fulfilled')
+        // console.log('promise fulfilled')
         setPersons(response.data)
       })
   }, [])
-  console.log('render', persons.length, 'persons')
+  // console.log('render', persons.length, 'persons')
 
 
   const addPerson = (event) => {
@@ -32,28 +33,30 @@ const App = () => {
       const personObject = {
         name: newName,
         number: newNumber,
-        id: persons.length + 1
+        id: String(persons.length + 1)
       }
-      setPersons(persons.concat(personObject))
-      setNewName('')
-      setNewNumber('')
+      personService.create(personObject).then(returnedNote => {
+        setPersons(persons.concat(returnedNote))
+        setNewName('')
+        setNewNumber('')
+      })
     }
   }
 
   const handleNameChange = (event) => {
-    console.log('handleNameChange event', event.target.value)
+    // console.log('handleNameChange event', event.target.value)
     setNewName(event.target.value)
   }
 
   const handleNumberChange = (event) => {
-    console.log('handleNumberChange event', event.target.value)
+    // console.log('handleNumberChange event', event.target.value)
     setNewNumber(event.target.value)
   }
 
   const filterPersons = persons.filter(person => person.name.toLowerCase().includes(newFilter.toLowerCase()))
 
   const handleFilterChange = (event) => {
-    console.log('handleFilterChange event', event.target.value)
+    // console.log('handleFilterChange event', event.target.value)
     setNewFilter(event.target.value)
   }
 
