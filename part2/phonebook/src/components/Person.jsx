@@ -1,8 +1,15 @@
-const Person = ({ person }) => {
+import personService from '../services/persons'
+
+
+
+const Person = ({ person, confirmDelete }) => {
+
+
     return (
         <div>
             {person.name} {person.number}
-        </div>
+            <button onClick={() => confirmDelete(person)}>delete</button>
+        </div >
     )
 }
 

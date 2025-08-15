@@ -33,11 +33,23 @@ const App = () => {
         number: newNumber,
         id: String(persons.length + 1)
       }
-      personService.create(personObject).then(returnedNote => {
-        setPersons(persons.concat(returnedNote))
-        setNewName('')
-        setNewNumber('')
-      })
+      personService
+        .create(personObject)
+        .then(returnedPerson => {
+          setPersons(persons.concat(returnedPerson))
+          setNewName('')
+          setNewNumber('')
+        })
+    }
+  }
+
+  const confirmDelete = (person) => {
+    if (window.confirm(`Delete ${person.name} ?`)) {
+      personService
+        .deletePerson(person.id)
+        .then(returnedPerson => {
+          setPersons(persons.filter(p => returnedPerson.id !== p.id))
+        })
     }
   }
 
@@ -67,7 +79,7 @@ const App = () => {
       <PersonForm addPerson={addPerson} newName={newName} handleNameChange={handleNameChange} newNumber={newNumber} handleNumberChange={handleNumberChange} />
 
       <h3>Numbers</h3>
-      <Persons filterPersons={filterPersons} />
+      <Persons filterPersons={filterPersons} confirmDelete={confirmDelete} />
 
     </div>
   )
