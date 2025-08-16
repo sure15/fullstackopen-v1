@@ -1,6 +1,3 @@
-import personService from '../services/persons'
-
-
 
 const Person = ({ person, confirmDelete }) => {
 
