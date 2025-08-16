@@ -11,7 +11,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
-  const [notificationMessage, setNotificationMessage] = useState()
+  const [notificationMessage, setNotificationMessage] = useState({})
 
   useEffect(() => {
     // console.log('effect')
@@ -35,11 +35,26 @@ const App = () => {
         personService
           .update(changedPerson.id, changedPerson)
           .then(returnedPerson => {
-            setNotificationMessage(`${returnedPerson.name} number changed`)
+            setNotificationMessage({
+              type: 'success',
+              message: `${returnedPerson.name} number changed`
+            })
             setTimeout(() => {
               setNotificationMessage(null)
             }, 5000);
             setPersons(persons.map(p => p.name === returnedPerson.name ? returnedPerson : p))
+            setNewName('')
+            setNewNumber('')
+          })
+          .catch(error => {
+            setNotificationMessage({
+              type: 'error',
+              message: `Information of ${changedPerson.name} has already been removed from server`
+            })
+            setTimeout(() => {
+              setNotificationMessage(null)
+            }, 5000);
+            setPersons(persons.filter(p => p.name !== changedPerson.name))
             setNewName('')
             setNewNumber('')
           })
@@ -56,7 +71,10 @@ const App = () => {
           setPersons(persons.concat(returnedPerson))
           setNewName('')
           setNewNumber('')
-          setNotificationMessage(`Added ${returnedPerson.name}`)
+          setNotificationMessage({
+            type: 'success',
+            message: `Added ${returnedPerson.name}`
+          })
           setTimeout(() => {
             setNotificationMessage(null)
           }, 5000);
