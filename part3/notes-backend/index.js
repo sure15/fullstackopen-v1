@@ -4,6 +4,7 @@ const app = express()
 
 app.use(express.json())
 app.use(cors())
+app.use(express.static('dist'))
 
 const requestLogger = (request, response, next) => {
     console.log('Method:', request.method)
@@ -82,6 +83,17 @@ app.post('/api/notes', (request, response) => {
     notes = notes.concat(note)
 
     response.json(note)
+})
+
+app.put('/api/notes/:id', (request, response) => {
+    const body = request.body
+    if (!body.content) {
+        return response.status(400).json({
+            error: 'content missing'
+        })
+    }
+    notes = notes.filter(note => note.id !== body.id).concat(body)
+    response.json(body)
 })
 
 const unkownEndpoint = (request, response) => {
