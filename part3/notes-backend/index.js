@@ -3,6 +3,16 @@ const app = express()
 
 app.use(express.json())
 
+const requestLogger = (request, response, next) => {
+    console.log('Method:', request.method)
+    console.log('Path: ', request.path)
+    console.log('Body: ', request.body)
+    console.log('---')
+    next()
+}
+
+app.use(requestLogger)
+
 let notes = [
     {
         id: "1",
@@ -71,6 +81,12 @@ app.post('/api/notes', (request, response) => {
 
     response.json(note)
 })
+
+const unkownEndpoint = (request, response) => {
+    response.status(404).send({ error: 'unkown endpoint' })
+}
+
+app.use(unkownEndpoint)
 
 const PORT = 3001
 app.listen(PORT, () => {
