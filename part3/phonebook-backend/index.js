@@ -43,22 +43,28 @@ app.get('/api/persons', (request, response) => {
     })
 })
 
-app.get('/info', (request, response) => {
-    response.send(`
-        <p>Phonebook has info for ${persons.length} people</p>
-        <p>${new Date().toString()}</p>
-        `)
+app.get('/info', (request, response, next) => {
+    Person.countDocuments()
+        .then(count => {
+            response.send(`
+            <p>Phonebook has info for ${count} people</p>
+            <p>${new Date().toString()}</p>
+            `)
+        })
+        .catch(error => next(error))
+
 })
 
-app.get('/api/persons/:id', (request, response) => {
-    const id = request.params.id
-    const person = persons.find(person => person.id === id)
-
-    if (person) {
-        response.json(person)
-    } else {
-        response.status(404).end()
-    }
+app.get('/api/persons/:id', (request, response, next) => {
+    Person.findById(request.params.id)
+        .then(person => {
+            if (person) {
+                response.json(person)
+            } else {
+                response.status(404).end()
+            }
+        })
+        .catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (request, response) => {
@@ -68,11 +74,6 @@ app.delete('/api/persons/:id', (request, response) => {
         })
         .catch(error => next(error))
 })
-
-const generatedId = () => {
-    const id = Math.floor(Math.random() * (1000000000 + 1))
-    return String(id)
-}
 
 app.post('/api/persons', (request, response) => {
     const body = request.body
