@@ -19,18 +19,18 @@ app.use(requestLogger)
 
 let notes = [
     {
-        id: "1",
-        content: "HTML is easy",
+        id: '1',
+        content: 'HTML is easy',
         important: true
     },
     {
-        id: "2",
-        content: "Browser can execute only JavaScript",
+        id: '2',
+        content: 'Browser can execute only JavaScript',
         important: false
     },
     {
-        id: "3",
-        content: "GET and POST are the most important methods of HTTP protocol",
+        id: '3',
+        content: 'GET and POST are the most important methods of HTTP protocol',
         important: true
     }
 ]
@@ -58,7 +58,7 @@ app.get('/api/notes/:id', (request, response, next) => {
         .catch(error => next(error))
 })
 
-app.delete('/api/notes/:id', (request, response) => {
+app.delete('/api/notes/:id', (request, response, next) => {
     Note.findByIdAndDelete(request.params.id)
         .then(result => {
             response.status(204).end()
