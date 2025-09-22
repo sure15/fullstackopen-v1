@@ -13,14 +13,12 @@ const initialblogs = [
     author: "Michael Chan",
     url: "https://reactpatterns.com/",
     likes: 7,
-    __v: 0
   },
   {
     title: "Go To Statement Considered Harmful",
     author: "Edsger W. Dijkstra",
     url: "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html",
     likes: 5,
-    __v: 0
   }
 ]
 
@@ -68,7 +66,6 @@ test('a valid blog can be added ', async () => {
     author: "Edsger W. Dijkstra",
     url: "http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html",
     likes: 12,
-    __v: 0
   }
 
   await api
@@ -84,6 +81,23 @@ test('a valid blog can be added ', async () => {
   assert.strictEqual(response.body.length, initialblogs.length + 1)
 
   assert(titles.includes('Canonical string reduction'))
+})
+
+test('if likes property is missing, it defaults to 0', async () => {
+  const newBlog = {
+    title: "First class tests",
+    author: "Robert C. Martin",
+    url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll",
+  }
+
+  const response = await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const savedBlog = response.body
+  assert.strictEqual(savedBlog.likes, 0, 'likes should default to 0')
 })
 
 after(async () => {
