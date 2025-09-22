@@ -52,7 +52,15 @@ test('a specific blog is within the returned blogs', async () => {
   assert.strictEqual(titles.includes('React patterns'), true)
 })
 
+test('blog posts are returned with id property instead of _id', async () => {
+  const response = await api.get('/api/blogs')
+  const blogs = response.body
 
+  blogs.forEach(blog => {
+    assert.ok(blog.id, 'blog should have id property')
+    assert.strictEqual(blog._id, undefined, 'blog should not have _id property')
+  })
+})
 
 after(async () => {
   await mongoose.connection.close()
