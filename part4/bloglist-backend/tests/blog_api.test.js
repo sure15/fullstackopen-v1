@@ -100,6 +100,40 @@ test('if likes property is missing, it defaults to 0', async () => {
   assert.strictEqual(savedBlog.likes, 0, 'likes should default to 0')
 })
 
+test('blog without title is not added', async () => {
+  const newBlog = {
+    author: 'Author Only',
+    url: 'http://example.com',
+    likes: 5
+  }
+
+  const response = await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+
+  const blogsAtEnd = await Blog.find({})
+  const titles = blogsAtEnd.map(b => b.title)
+  assert.ok(!titles.includes(undefined), 'should not save blog without title')
+})
+
+test('blog without url is not added', async () => {
+  const newBlog = {
+    title: 'Title Only',
+    author: 'Author Only',
+    likes: 5
+  }
+
+  const response = await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+
+  const blogsAtEnd = await Blog.find({})
+  const urls = blogsAtEnd.map(b => b.url)
+  assert.ok(!urls.includes(undefined), 'should not save blog without url')
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
