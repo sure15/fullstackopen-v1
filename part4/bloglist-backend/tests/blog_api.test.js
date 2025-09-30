@@ -68,11 +68,19 @@ test('a valid blog can be added ', async () => {
     likes: 12,
   }
 
+  const loginResponse = await api
+    .post('/api/login')
+    .send({ username: 'root', password: 'sekret' })
+
+  const token = loginResponse.body.token
+
   await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/)
+
 
   const response = await api.get('/api/blogs')
 
@@ -90,8 +98,15 @@ test('if likes property is missing, it defaults to 0', async () => {
     url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll",
   }
 
+  const loginResponse = await api
+    .post('/api/login')
+    .send({ username: 'root', password: 'sekret' })
+
+  const token = loginResponse.body.token
+
   const response = await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/)
@@ -107,8 +122,15 @@ test('blog without title is not added', async () => {
     likes: 5
   }
 
+  const loginResponse = await api
+    .post('/api/login')
+    .send({ username: 'root', password: 'sekret' })
+
+  const token = loginResponse.body.token
+
   await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
     .send(newBlog)
     .expect(400)
 
@@ -124,8 +146,15 @@ test('blog without url is not added', async () => {
     likes: 5
   }
 
+  const loginResponse = await api
+    .post('/api/login')
+    .send({ username: 'root', password: 'sekret' })
+
+  const token = loginResponse.body.token
+
   await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
     .send(newBlog)
     .expect(400)
 
@@ -134,20 +163,52 @@ test('blog without url is not added', async () => {
   assert.ok(!urls.includes(undefined), 'should not save blog without url')
 })
 
-test('succeeds with status code 204 if id is valid', async () => {
-  const blogsAtStart = await Blog.find({})
-  const blogToDelete = blogsAtStart[0]
+test('adding a blog fails with 401 if token is not provided', async () => {
+  const newBlog = {
+    title: 'Unauthorized blog',
+    author: 'No Token',
+    url: 'http://example.com'
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(401)
+    .expect('Content-Type', /application\/json/)
+})
+
+test('succeeds with status code 204 if id is valid and user is authorized', async () => {
+  const loginResponse = await api
+    .post('/api/login')
+    .send({ username: 'root', password: 'sekret' })
+  const token = loginResponse.body.token
+
+  const newBlog = {
+    title: 'Blog to be deleted',
+    author: 'Root User',
+    url: 'http://example.com',
+    likes: 0
+  }
+
+  const addedBlogResponse = await api
+    .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
+    .send(newBlog)
+    .expect(201)
+
+  const blogToDelete = addedBlogResponse.body
 
   await api
     .delete(`/api/blogs/${blogToDelete.id}`)
+    .set('Authorization', `Bearer ${token}`)
     .expect(204)
 
   const blogsAtEnd = await Blog.find({})
-  assert.strictEqual(blogsAtEnd.length, blogsAtStart.length - 1)
-
   const ids = blogsAtEnd.map(b => b.id)
   assert.ok(!ids.includes(blogToDelete.id), 'deleted blog should be removed')
 })
+
+
 
 test('a blog\'s likes can be updated', async () => {
   const blogsAtStart = await Blog.find({})
