@@ -107,7 +107,7 @@ test('blog without title is not added', async () => {
     likes: 5
   }
 
-  const response = await api
+  await api
     .post('/api/blogs')
     .send(newBlog)
     .expect(400)
@@ -124,7 +124,7 @@ test('blog without url is not added', async () => {
     likes: 5
   }
 
-  const response = await api
+  await api
     .post('/api/blogs')
     .send(newBlog)
     .expect(400)
